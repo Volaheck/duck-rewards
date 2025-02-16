@@ -40,6 +40,9 @@ interface AnalysisData {
     expectedTotal: number;
     difference: number;
     placesFor90Percent: number;
+    roundingDifferencePercentage: number;
+    roundingDifference: number;
+    rawTotalReward: number;
   };
   isKeyPoint: boolean;
   minRewardPlace: number;
@@ -180,13 +183,13 @@ export const FirstPlaceAnalysis = () => {
     {
       key: 'roundingDifference',
       title: 'Разница округления',
-      getValue: (data) => data.roundingDifference,
+      getValue: (data) => data.analysis.roundingDifference,
       format: (value) => (value > 0 ? '+' : '') + value.toLocaleString()
     },
     {
       key: 'roundingPercentage',
       title: '% разницы',
-      getValue: (data) => data.roundingPercentage,
+      getValue: (data) => data.analysis.roundingDifferencePercentage,
       format: (value) => `${value.toFixed(2)}%`
     }
   ], [rewardPercentage]);
@@ -217,7 +220,7 @@ export const FirstPlaceAnalysis = () => {
           reward,
           rawReward,
           roundingDifference: reward - rawReward,
-          roundingPercentage: ((reward - rawReward) / rawReward) * 100,
+          roundingPercentage: analysis.roundingDifferencePercentage,
           analysis,
           isKeyPoint: true,
           minRewardPlace: findMinRewardPlace(places)
