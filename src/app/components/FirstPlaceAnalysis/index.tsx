@@ -33,6 +33,7 @@ const TARGET_REWARD = 4000;
 type ColumnKey = 'places' | 'reward' | 'percentage' | 'totalReward' | 'expectedTotal' | 'difference' | 'minRewardPlace' | 'minRewardPercentage' | 'placesFor90Percent' | 'rawReward' | 'roundingDifference' | 'roundingPercentage';
 
 interface AnalysisData {
+  id: string;
   places: number;
   reward: number;
   analysis: {
@@ -216,6 +217,7 @@ export const FirstPlaceAnalysis = () => {
         const reward = getRewardForPlace(1, 0, places);
         const rawReward = Math.max(10, Math.floor(getDiscreteReward(1, places)));
         return {
+          id: `key_${places}`,
           places,
           reward,
           rawReward,
@@ -235,6 +237,7 @@ export const FirstPlaceAnalysis = () => {
       const reward = getRewardForPlace(1, 0, places);
       const rawReward = Math.max(10, Math.floor(getDiscreteReward(1, places)));
       return {
+        id: `row_${places}`,
         places,
         reward,
         rawReward,
@@ -341,7 +344,7 @@ export const FirstPlaceAnalysis = () => {
                 const displayValue = selectedColumn.format ? selectedColumn.format(value, data) : value;
                 return (
                   <SingleColumnView 
-                    key={data.places}
+                    key={data.id}
                     $isKeyPoint={data.isKeyPoint}
                   >
                     <ColumnLabel>{data.places}:</ColumnLabel>
@@ -411,7 +414,7 @@ export const FirstPlaceAnalysis = () => {
             <tbody>
               {filteredAnalyses.map((data) => (
                 <tr 
-                  key={data.places}
+                  key={data.id}
                   style={{
                     backgroundColor: data.isKeyPoint ? '#f0f8ff' : 'inherit',
                     fontWeight: data.isKeyPoint ? 'bold' : 'normal'
