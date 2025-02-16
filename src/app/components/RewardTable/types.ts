@@ -1,6 +1,7 @@
 export type RewardTableColumnKey = 'place' | 'reward' | 'percentage';
 
 export interface RewardTableData {
+  id: string;
   place: number;
   reward: number;
   percentage: number;

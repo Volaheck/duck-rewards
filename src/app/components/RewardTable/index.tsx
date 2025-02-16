@@ -50,6 +50,7 @@ export const RewardTable = ({ places, showOnlyFirstPlace, onDelete }: RewardTabl
 
   const data: RewardTableData[] = useMemo(() => 
     positions.map(pos => ({
+      id: `reward_${places}_${pos}`,
       place: pos,
       reward: getRewardForPlace(pos, 0, places),
       percentage: Math.round((getRewardForPlace(pos, 0, places) / analysis.totalReward) * 100)
@@ -170,7 +171,7 @@ export const RewardTable = ({ places, showOnlyFirstPlace, onDelete }: RewardTabl
         </thead>
         <tbody>
           {data.map(rowData => (
-            <tr key={rowData.place}>
+            <tr key={rowData.id}>
               {columns
                 .filter(column => visibleColumns.includes(column.key))
                 .map(column => (

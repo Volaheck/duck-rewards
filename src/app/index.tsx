@@ -8,10 +8,6 @@ export const App = () => {
   const [distributions, setDistributions] = useState<number[]>([]);
   const [showOnlyFirstPlace, setShowOnlyFirstPlace] = useState(false);
 
-  const handleAddDistribution = (places: number) => {
-    setDistributions(prev => [...prev, places]);
-  };
-
   const handleDelete = (places: number) => {
     setDistributions(prev => prev.filter(p => p !== places));
   };
@@ -19,14 +15,14 @@ export const App = () => {
   return (
     <AppContainer>
       <Header 
-        onAddDistribution={handleAddDistribution}
+        onAddDistribution={(places) => setDistributions(prev => [...prev, places])}
         onShowOnlyFirstPlace={setShowOnlyFirstPlace}
       />
       <TablesGrid>
         <FirstPlaceAnalysis />
-        {distributions.map(places => (
+        {distributions.map((places, index) => (
           <RewardTable 
-            key={places} 
+            key={`table_${places}_${index}`}
             places={places}
             showOnlyFirstPlace={showOnlyFirstPlace}
             onDelete={() => handleDelete(places)}
