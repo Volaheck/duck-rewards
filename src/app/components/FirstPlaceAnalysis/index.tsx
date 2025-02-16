@@ -24,13 +24,13 @@ import {
   SingleColumnWrapper,
   ChartContainer
 } from './styled';
-import { analyzeDistribution, getRewardForPlace } from '../../utils/rewards';
+import { analyzeDistribution, getRewardForPlace, getDiscreteReward } from '../../utils/rewards';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const DEFAULT_ROWS = 64;
 const TARGET_REWARD = 4000;
 
-type ColumnKey = 'places' | 'reward' | 'percentage' | 'totalReward' | 'expectedTotal' | 'difference' | 'minRewardPlace' | 'minRewardPercentage' | 'placesFor90Percent';
+type ColumnKey = 'places' | 'reward' | 'percentage' | 'totalReward' | 'expectedTotal' | 'difference' | 'minRewardPlace' | 'minRewardPercentage' | 'placesFor90Percent' | 'rawReward' | 'roundingDifference' | 'roundingPercentage';
 
 interface AnalysisData {
   places: number;
@@ -43,6 +43,9 @@ interface AnalysisData {
   };
   isKeyPoint: boolean;
   minRewardPlace: number;
+  rawReward: number;
+  roundingDifference: number;
+  roundingPercentage: number;
 }
 
 interface Column {
@@ -65,7 +68,8 @@ export const FirstPlaceAnalysis = () => {
     const saved = localStorage.getItem('columnFilters');
     return saved ? JSON.parse(saved) : [
       'places', 'reward', 'percentage', 'totalReward', 'expectedTotal',
-      'difference', 'minRewardPlace', 'minRewardPercentage', 'placesFor90Percent'
+      'difference', 'minRewardPlace', 'minRewardPercentage', 'placesFor90Percent',
+      'rawReward', 'roundingDifference', 'roundingPercentage'
     ];
   });
 
@@ -166,6 +170,24 @@ export const FirstPlaceAnalysis = () => {
       ),
       getValue: (data) => data.analysis.placesFor90Percent,
       format: (value, data) => `${value} (${Math.round((value / data.places) * 100)}%)`
+    },
+    {
+      key: 'rawReward',
+      title: 'Исходная награда',
+      getValue: (data) => data.rawReward,
+      format: (value) => value.toLocaleString()
+    },
+    {
+      key: 'roundingDifference',
+      title: 'Разница округления',
+      getValue: (data) => data.roundingDifference,
+      format: (value) => (value > 0 ? '+' : '') + value.toLocaleString()
+    },
+    {
+      key: 'roundingPercentage',
+      title: '% разницы',
+      getValue: (data) => data.roundingPercentage,
+      format: (value) => `${value.toFixed(2)}%`
     }
   ], [rewardPercentage]);
 
@@ -186,22 +208,35 @@ export const FirstPlaceAnalysis = () => {
         n++;
       }
       
-      return keyPoints.map(places => ({
-        places,
-        reward: getRewardForPlace(1, 0, places),
-        analysis: analyzeDistribution(places, rewardPercentage),
-        isKeyPoint: true,
-        minRewardPlace: findMinRewardPlace(places)
-      }));
+      return keyPoints.map(places => {
+        const analysis = analyzeDistribution(places, rewardPercentage);
+        const reward = getRewardForPlace(1, 0, places);
+        const rawReward = Math.max(10, Math.floor(getDiscreteReward(1, places)));
+        return {
+          places,
+          reward,
+          rawReward,
+          roundingDifference: reward - rawReward,
+          roundingPercentage: ((reward - rawReward) / rawReward) * 100,
+          analysis,
+          isKeyPoint: true,
+          minRewardPlace: findMinRewardPlace(places)
+        };
+      });
     }
 
     // Иначе генерируем все строки
     return Array.from({ length: rowsCount }, (_, i) => {
       const places = i + 1;
       const isKeyPoint = Math.log2(places + 1) % 1 === 0;
+      const reward = getRewardForPlace(1, 0, places);
+      const rawReward = Math.max(10, Math.floor(getDiscreteReward(1, places)));
       return {
         places,
-        reward: getRewardForPlace(1, 0, places),
+        reward,
+        rawReward,
+        roundingDifference: reward - rawReward,
+        roundingPercentage: ((reward - rawReward) / rawReward) * 100,
         analysis: analyzeDistribution(places, rewardPercentage),
         isKeyPoint,
         minRewardPlace: findMinRewardPlace(places)

@@ -35,4 +35,40 @@ export const HeaderContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 15px;
+`;
+
+export const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const DeleteButton = styled.button`
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid #ff4d4f;
+  border-radius: 4px;
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    background-color: #fff1f0;
+  }
+`;
+
+export const StatsToggleButton = styled.button`
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #666;
+
+  &:hover {
+    color: #333;
+  }
 `; 

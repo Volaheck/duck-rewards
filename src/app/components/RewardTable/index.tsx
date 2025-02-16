@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { TableWrapper, Table, Th, Td, SubTitle, HeaderContainer } from './styled';
+import { TableWrapper, Table, Th, Td, SubTitle, HeaderContainer, HeaderActions, DeleteButton, StatsToggleButton } from './styled';
 import { analyzeDistribution, getRewardForPlace } from '../../utils/rewards';
 import { ColumnFilters } from '../ColumnFilters';
 import { RewardTableColumn, RewardTableColumnKey, RewardTableData } from './types';
@@ -7,15 +7,17 @@ import { RewardTableColumn, RewardTableColumnKey, RewardTableData } from './type
 interface RewardTableProps {
   places: number;
   showOnlyFirstPlace?: boolean;
+  onDelete?: () => void;
 }
 
-export const RewardTable = ({ places, showOnlyFirstPlace }: RewardTableProps) => {
+export const RewardTable = ({ places, showOnlyFirstPlace, onDelete }: RewardTableProps) => {
   const [showFilters, setShowFilters] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<RewardTableColumnKey[]>
     (() => {
       const saved = localStorage.getItem(`columnFilters_${places}`);
       return saved ? JSON.parse(saved) : ['place', 'reward', 'percentage'];
     });
+  const [showStats, setShowStats] = useState(false);
 
   const analysis = analyzeDistribution(places);
   const positions = useMemo(() => 
@@ -63,66 +65,97 @@ export const RewardTable = ({ places, showOnlyFirstPlace }: RewardTableProps) =>
     <TableWrapper>
       <HeaderContainer>
         <SubTitle>Анализ распределения для {places} мест</SubTitle>
-        <ColumnFilters
-          columns={columns}
-          visibleColumns={visibleColumns}
-          showFilters={showFilters}
-          onToggleFilters={() => setShowFilters(!showFilters)}
-          onToggleColumn={(key) => {
-            setVisibleColumns(prev => 
-              prev.includes(key)
-                ? prev.filter(k => k !== key)
-                : [...prev, key]
-            );
-          }}
-        />
+        <HeaderActions>
+          <ColumnFilters
+            columns={columns}
+            visibleColumns={visibleColumns}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+            onToggleColumn={(key) => {
+              setVisibleColumns(prev => 
+                prev.includes(key)
+                  ? prev.filter(k => k !== key)
+                  : [...prev, key]
+              );
+            }}
+          />
+          <DeleteButton onClick={onDelete}>
+            Удалить
+          </DeleteButton>
+        </HeaderActions>
       </HeaderContainer>
 
       <Table>
         <thead>
           <tr>
-            <Th colSpan={2}>Общая статистика</Th>
+            <Th colSpan={2}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                Общая статистика
+                <StatsToggleButton onClick={() => setShowStats(!showStats)}>
+                  {showStats ? '▼' : '▶'}
+                </StatsToggleButton>
+              </div>
+            </Th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <Td>Ожидаемая сумма наград</Td>
-            <Td>{analysis.expectedTotal.toLocaleString()}</Td>
-          </tr>
-          <tr>
-            <Td>Фактическая сумма наград</Td>
-            <Td>{analysis.totalReward.toLocaleString()}</Td>
-          </tr>
-          <tr>
-            <Td>Разница</Td>
-            <Td style={{
-              color: analysis.difference > 0 ? 'green' : 
-                     analysis.difference < 0 ? 'red' : 'inherit'
-            }}>
-              {analysis.difference > 0 ? '+' : ''}{analysis.difference.toLocaleString()}
-            </Td>
-          </tr>
-          <tr>
-            <Td>Средняя награда</Td>
-            <Td>{analysis.averageReward.toLocaleString()}</Td>
-          </tr>
-          <tr>
-            <Td>Медианная награда</Td>
-            <Td>{analysis.medianReward.toLocaleString()}</Td>
-          </tr>
-          <tr>
-            <Td>Максимальная награда</Td>
-            <Td>{analysis.maxReward.toLocaleString()}</Td>
-          </tr>
-          <tr>
-            <Td>Минимальная награда</Td>
-            <Td>{analysis.minReward.toLocaleString()}</Td>
-          </tr>
-          <tr>
-            <Td>Количество уровней</Td>
-            <Td>{analysis.levels}</Td>
-          </tr>
-        </tbody>
+        {showStats && (
+          <tbody>
+            <tr>
+              <Td>Ожидаемая сумма наград</Td>
+              <Td>{analysis.expectedTotal.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Фактическая сумма наград</Td>
+              <Td>{analysis.totalReward.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Разница</Td>
+              <Td style={{
+                color: analysis.difference > 0 ? 'green' : 
+                       analysis.difference < 0 ? 'red' : 'inherit'
+              }}>
+                {analysis.difference > 0 ? '+' : ''}{analysis.difference.toLocaleString()}
+              </Td>
+            </tr>
+            <tr>
+              <Td>Средняя награда</Td>
+              <Td>{analysis.averageReward.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Медианная награда</Td>
+              <Td>{analysis.medianReward.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Максимальная награда</Td>
+              <Td>{analysis.maxReward.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Минимальная награда</Td>
+              <Td>{analysis.minReward.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Количество уровней</Td>
+              <Td>{analysis.levels}</Td>
+            </tr>
+            <tr>
+              <Td>Исходная сумма наград (до округления)</Td>
+              <Td>{analysis.rawTotalReward.toLocaleString()}</Td>
+            </tr>
+            <tr>
+              <Td>Разница из-за округления</Td>
+              <Td style={{
+                color: analysis.roundingDifference > 0 ? 'green' : 
+                       analysis.roundingDifference < 0 ? 'red' : 'inherit'
+              }}>
+                {analysis.roundingDifference > 0 ? '+' : ''}{analysis.roundingDifference.toLocaleString()}
+              </Td>
+            </tr>
+            <tr>
+              <Td>Процент разницы</Td>
+              <Td>{(analysis.roundingDifferencePercentage).toFixed(2)}%</Td>
+            </tr>
+          </tbody>
+        )}
       </Table>
 
       <Table style={{ marginTop: '20px' }}>

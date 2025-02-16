@@ -12,6 +12,10 @@ export const App = () => {
     setDistributions(prev => [...prev, places]);
   };
 
+  const handleDelete = (places: number) => {
+    setDistributions(prev => prev.filter(p => p !== places));
+  };
+
   return (
     <AppContainer>
       <Header 
@@ -25,6 +29,7 @@ export const App = () => {
             key={places} 
             places={places}
             showOnlyFirstPlace={showOnlyFirstPlace}
+            onDelete={() => handleDelete(places)}
           />
         ))}
       </TablesGrid>

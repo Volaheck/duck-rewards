@@ -1,8 +1,11 @@
-export type ColumnKey = 'places' | 'reward' | 'percentage' | 'totalReward' | 'expectedTotal' | 'difference' | 'minRewardPlace' | 'minRewardPercentage' | 'placesFor90Percent';
+export type ColumnKey = 'places' | 'reward' | 'rawReward' | 'roundingDifference' | 'roundingPercentage' | 'percentage' | 'totalReward' | 'expectedTotal' | 'difference' | 'minRewardPlace' | 'minRewardPercentage' | 'placesFor90Percent';
 
 export interface AnalysisData {
   places: number;
   reward: number;
+  rawReward: number;
+  roundingDifference: number;
+  roundingPercentage: number;
   analysis: {
     totalReward: number;
     expectedTotal: number;
