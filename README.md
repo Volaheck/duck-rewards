@@ -1,50 +1,31 @@
-# React + TypeScript + Vite
+# Анализатор распределения наград
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Инструмент для анализа и визуализации распределения наград между участниками. Позволяет исследовать различные сценарии распределения и их влияние на итоговые суммы.
 
-Currently, two official plugins are available:
+## Основные возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Анализ распределения наград для произвольного количества мест
+- Сравнение исходных и округленных значений наград
+- Отслеживание ключевых метрик:
+  - Общая сумма наград (исходная и округленная)
+  - Разница между ожидаемой и фактической суммой
+  - Процент наград, приходящийся на первые места
+  - Количество мест с наградой выше заданного порога
+- Фильтрация и настройка отображаемых колонок
+- Визуализация данных в виде графиков
+- Фокус на ключевых точках распределения (2^n - 1)
 
-## Expanding the ESLint configuration
+## Формула распределения
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Используется ступенчатая формула с линейной интерполяцией между ключевыми точками:
+- Базовая награда за место: 4000
+- Бонусный пул: 80000 (с затуханием)
+- Минимальная награда: 10
+- Округление для удобства отображения
 
-- Configure the top-level `parserOptions` property like this:
+## Технологии
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- React
+- TypeScript
+- Styled Components
+- Recharts (визуализация)
